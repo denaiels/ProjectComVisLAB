@@ -70,7 +70,7 @@ def get_test_images_data(test_root_path):
     for image_path in os.listdir(test_root_path):
         full_image_path = '{}/{}'.format(test_root_path, image_path)
 
-        if not (full_image_path.endswith('.jpg') | full_image_path.endswith('.png') | full_image_path.endswith('.jpeg')):
+        if not (full_image_path.endswith('.jpg') | full_image_path.endswith('.png') | full_image_path.endswith('.jpeg') | full_image_path.endswith('.JPG')):
             continue
                 
         image = cv2.imread(full_image_path)
