@@ -102,7 +102,8 @@ def predict(recognizer, test_faces_gray):
     
 
 def draw_prediction_results(predict_results, test_image_list, test_faces_rects, train_names):
-    
+    result_images = []
+
     for i, test_face in enumerate(test_faces_rects):
         x = test_faces_rects[i][0]
         y = test_faces_rects[i][1]
@@ -110,21 +111,30 @@ def draw_prediction_results(predict_results, test_image_list, test_faces_rects, 
         height = test_faces_rects[i][3]
 
         text = '{}: {:.2f}%'.format(train_names[i], predict_results[i][1])
+        # text = 'Hello World'
 
-        cv2.rectangle(test_image_list[i], (x, y), (x+width, y+height), (0, 255, 0), 2)
-        cv2.putText(test_image_list[i], text, (x, y-10), cv2.FONT_HERSHEY_PLAIN, 0.5, 0, 255, 0)
+        image = test_image_list[i]
 
-    return test_image_list
+        cv2.rectangle(image, (x, y), (x+width, y+height), (0, 255, 0), 2)
+        cv2.putText(image, text, (x, y-10), cv2.FONT_HERSHEY_PLAIN, 1, (0, 255, 0))
+
+        result_images.append(image)
+
+        # cv2.imshow('Result', test_image_list[i])
+        # cv2.waitKey(0)
+
+
+    return result_images
     
-def combine_and_show_result(image_list):
-    images_list = Image.new('RGB', (1000, 200))
+# def combine_and_show_result(image_list):
+#     images_list = Image.new('RGB', (1000, 200))
 
-    for image in image_list:
-        for i in xrange(0, 1000, 200):
-            im = Image.open(image)
-            images_list.paste(im, (i, 0))
+#     for image in image_list:
+#         for i in xrange(0, 1000, 200):
+#             im = Image.open(image)
+#             images_list.paste(im, (i, 0))
     
-    return images_list
+#     return images_list
 
 
 '''
