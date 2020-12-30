@@ -1,7 +1,6 @@
 import cv2
 import os
 import numpy as np
-# from PIL import image
 
 def get_path_list(root_path):
     full_human_path = []
@@ -111,31 +110,28 @@ def draw_prediction_results(predict_results, test_image_list, test_faces_rects, 
         height = test_faces_rects[i][3]
 
         text = '{}: {:.2f}%'.format(train_names[i], predict_results[i][1])
-        # text = 'Hello World'
 
         image = test_image_list[i]
 
-        cv2.rectangle(image, (x, y), (x+width, y+height), (0, 255, 0), 2)
-        cv2.putText(image, text, (x, y-10), cv2.FONT_HERSHEY_PLAIN, 1, (0, 255, 0))
+        cv2.rectangle(image, (x, y), (x+width, y+height), (0, 0, 255), 10)
+        cv2.putText(image, text, (x, y-10), cv2.FONT_HERSHEY_TRIPLEX, 5, (0, 0, 255))
 
         result_images.append(image)
 
-        # cv2.imshow('Result', test_image_list[i])
-        # cv2.waitKey(0)
-
-
     return result_images
     
-# def combine_and_show_result(image_list):
-#     images_list = Image.new('RGB', (1000, 200))
-
-#     for image in image_list:
-#         for i in xrange(0, 1000, 200):
-#             im = Image.open(image)
-#             images_list.paste(im, (i, 0))
     
-#     return images_list
+def combine_and_show_result(image_list):
+    image0 = cv2.resize(image_list[0], (200, 200))  
+    image1 = cv2.resize(image_list[1], (200, 200))
+    image2 = cv2.resize(image_list[2], (200, 200))
+    image3 = cv2.resize(image_list[3], (200, 200))
+    image4 = cv2.resize(image_list[4], (200, 200))
 
+    image_stacked = np.hstack((image0, image1, image2, image3, image4))
+
+    cv2.imshow('Result', image_stacked)
+    cv2.waitKey(0)
 
 '''
 You may modify the code below if it's marked between
@@ -191,8 +187,4 @@ if __name__ == "__main__":
     test_faces_gray, test_faces_rects, _ = detect_faces_and_filter(test_image_list)
     predict_results = predict(recognizer, test_faces_gray)
     predicted_test_image_list = draw_prediction_results(predict_results, test_image_list, test_faces_rects, train_names)
-    for image in predicted_test_image_list:
-        cv2.imshow('Result', image)
-        cv2.waitKey(0)
-
-    # combine_and_show_result(predicted_test_image_list)
+    combine_and_show_result(predicted_test_image_list)
