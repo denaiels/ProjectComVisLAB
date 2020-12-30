@@ -2,8 +2,6 @@ import cv2
 import os
 import numpy as np
 
-#testt
-
 def get_path_list(root_path):
     full_human_path = []
     
