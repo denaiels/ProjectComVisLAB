@@ -1,6 +1,7 @@
 import cv2
 import os
 import numpy as np
+# from PIL import image
 
 def get_path_list(root_path):
     full_human_path = []
@@ -101,38 +102,30 @@ def predict(recognizer, test_faces_gray):
     
 
 def draw_prediction_results(predict_results, test_image_list, test_faces_rects, train_names):
-    '''
-        To draw prediction results on the given test images
+    
+    for i, test_face in enumerate(test_faces_rects):
+        x = test_faces_rects[i][0]
+        y = test_faces_rects[i][1]
+        width = test_faces_rects[i][2]
+        height = test_faces_rects[i][3]
 
-        Parameters
-        ----------
-        predict_results : list
-            List containing all prediction results from given test faces
-        test_image_list : list
-            List containing all loaded test images
-        test_faces_rects : list
-            List containing all filtered faces location saved in rectangle
-        train_names : list
-            List containing the names of the train sub-directories
+        text = '{}: {:.2f}%'.format(train_names[i], predict_results[i][1])
 
-        Returns
-        -------
-        list
-            List containing all test images after being drawn with
-            prediction result
-    '''
+        cv2.rectangle(test_image_list[i], (x, y), (x+width, y+height), (0, 255, 0), 2)
+        cv2.putText(test_image_list[i], text, (x, y-10), cv2.FONT_HERSHEY_PLAIN, 0.5, 0, 255, 0)
+
+    return test_image_list
     
 def combine_and_show_result(image_list):
-    '''
-        To show the final image that already combine into one image
-        Before the image combined, it must be resize with
-        width and height : 200px
+    images_list = Image.new('RGB', (1000, 200))
 
-        Parameters
-        ----------
-        image_list : nparray
-            Array containing image data
-    '''
+    for image in image_list:
+        for i in xrange(0, 1000, 200):
+            im = Image.open(image)
+            images_list.paste(im, (i, 0))
+    
+    return images_list
+
 
 '''
 You may modify the code below if it's marked between
@@ -187,5 +180,9 @@ if __name__ == "__main__":
     test_image_list = get_test_images_data(test_root_path)
     test_faces_gray, test_faces_rects, _ = detect_faces_and_filter(test_image_list)
     predict_results = predict(recognizer, test_faces_gray)
-    # predicted_test_image_list = draw_prediction_results(predict_results, test_image_list, test_faces_rects, train_names)
+    predicted_test_image_list = draw_prediction_results(predict_results, test_image_list, test_faces_rects, train_names)
+    for image in predicted_test_image_list:
+        cv2.imshow('Result', image)
+        cv2.waitKey(0)
+
     # combine_and_show_result(predicted_test_image_list)
