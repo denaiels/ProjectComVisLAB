@@ -179,10 +179,9 @@ if __name__ == "__main__":
     '''
     
     train_names = get_path_list(train_root_path)
-    print(train_names)
-    # train_image_list, image_classes_list = get_class_names(train_root_path, train_names)
-    # train_face_grays, _, filtered_classes_list = detect_faces_and_filter(train_image_list, image_classes_list)
-    # recognizer = train(train_face_grays, filtered_classes_list)    
+    train_image_list, image_classes_list = get_class_names(train_root_path, train_names)
+    train_face_grays, _, filtered_classes_list = detect_faces_and_filter(train_image_list, image_classes_list)
+    recognizer = train(train_face_grays, filtered_classes_list)    
 
     '''
         Please modify test_image_path value according to the location of
@@ -199,9 +198,9 @@ if __name__ == "__main__":
         -------------------
     '''
 
-    # test_names = get_path_list(test_root_path)
-    # test_image_list = get_test_images_data(test_root_path)
-    # test_faces_gray, test_faces_rects, _ = detect_faces_and_filter(test_image_list)
-    # predict_results = predict(recognizer, test_faces_gray)
-    # predicted_test_image_list = draw_prediction_results(predict_results, test_image_list, test_faces_rects, train_names)
-    # combine_and_show_result(predicted_test_image_list)    
+    test_names = get_path_list(test_root_path)
+    test_image_list = get_test_images_data(test_root_path)
+    test_faces_gray, test_faces_rects, _ = detect_faces_and_filter(test_image_list)
+    predict_results = predict(recognizer, test_faces_gray)
+    predicted_test_image_list = draw_prediction_results(predict_results, test_image_list, test_faces_rects, train_names)
+    combine_and_show_result(predicted_test_image_list)

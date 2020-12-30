@@ -5,37 +5,31 @@ import numpy as np
 def get_path_list(root_path):
     full_human_path = []
     
-    for label, human_path in enumerate(os.listdir(root_path)):
-        if human_path != '.DS_Store':
-            full_human_path.append('{}/{}'.format(root_path, human_path))
+    for human_path in os.listdir(root_path):
+        full_human_path.append('{}/{}'.format(root_path, human_path))
     
     return full_human_path
 
 
 def get_class_names(root_path, train_names):
-    labels = []
+    classes = []
     images = []
     
-    for label, full_human_path in enumerate(train_names):
-        # print(label, full_human_path)
-        for  image_path in os.listdir(full_human_path):
+    for label, human_name in enumerate(os.listdir(root_path)):
+        full_human_path = train_names[label]
+        
+        for image_path in os.listdir(full_human_path):
             full_image_path = '{}/{}'.format(full_human_path, image_path)
-            # print(full_image_path)
-            if not (full_image_path.endswith('.jpg') | full_image_path.endswith('.png') | full_image_path.endswith('.jpeg')):
+
+            if not (full_image_path.endswith('.jpg') | full_image_path.endswith('.png') | full_image_path.endswith('.jpeg') | full_image_path.endswith('.JPG')):
                 continue
                 
             image = cv2.imread(full_image_path)
 
-            # cv2.imshow('image', image)
-            # cv2.waitKey(0)
-
             images.append(image)
-            labels.append(label)
+            classes.append(label)
 
-    # print(labels)
-    # print(images)
-
-    return images, labels
+    return images, classes
         
 
 
@@ -48,18 +42,18 @@ def detect_faces_and_filter(image_list, image_classes_list=None):
 
     for label, image in enumerate(image_list):
         image_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        detected_faces = cascade.detectMultiScale(image_gray, 1.2, 3)
+        detected_faces = cascade.detectMultiScale(image_gray, 1.2, 7)
 
-        for detected_face in detected_faces:
-            x, y, width, height = detected_face
-            face = image_gray[y:y+height, x:x+width]
-            # cv2.imshow('face', face)
-            # cv2.waitKey(0)
-            face_list.append(face)
-            face_location.append([x, y, width, height])
-            if(image_classes_list):
-                face_class_list.append(image_classes_list[label])
-    
+        if(len(detected_faces) == 1):
+            for detected_face in detected_faces:
+                x, y, width, height = detected_face
+                face = image_gray[y:y+height, x:x+width]
+
+                face_list.append(face)
+                face_location.append(detected_face)
+                if(image_classes_list):
+                    face_class_list.append(image_classes_list[label])
+
     return face_list, face_location, face_class_list
 
 
@@ -80,10 +74,6 @@ def get_test_images_data(test_root_path):
             continue
                 
         image = cv2.imread(full_image_path)
-
-        # cv2.imshow('image', image)
-        # cv2.waitKey(0)
-
         images.append(image)
     
     return images
@@ -94,27 +84,30 @@ def predict(recognizer, test_faces_gray):
 
     for face in test_faces_gray:
         label, confidence = recognizer.predict(face)
-
         predict_results.append([label, confidence])
+
+        
 
     return predict_results
     
 
 def draw_prediction_results(predict_results, test_image_list, test_faces_rects, train_names):
+    root_path = 'dataset/train'
+    human_name = os.listdir(root_path)
+
     result_images = []
 
-    for i, test_face in enumerate(test_faces_rects):
+    for i, test_face in enumerate(test_image_list):
         x = test_faces_rects[i][0]
         y = test_faces_rects[i][1]
         width = test_faces_rects[i][2]
         height = test_faces_rects[i][3]
 
-        text = '{}: {:.2f}%'.format(train_names[i], predict_results[i][1])
-
-        image = test_image_list[i]
+        text = human_name[predict_results[i][0]]
+        image = test_face
 
         cv2.rectangle(image, (x, y), (x+width, y+height), (0, 0, 255), 10)
-        cv2.putText(image, text, (x, y-10), cv2.FONT_HERSHEY_TRIPLEX, 5, (0, 0, 255))
+        cv2.putText(image, text, (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, fontScale=3, thickness=10, color=(0, 0, 255))
 
         result_images.append(image)
 
@@ -165,7 +158,7 @@ if __name__ == "__main__":
     train_names = get_path_list(train_root_path)
     train_image_list, image_classes_list = get_class_names(train_root_path, train_names)
     train_face_grays, _, filtered_classes_list = detect_faces_and_filter(train_image_list, image_classes_list)
-    recognizer = train(train_face_grays, filtered_classes_list)    
+    recognizer = train(train_face_grays, filtered_classes_list)     
 
     '''
         Please modify test_image_path value according to the location of
